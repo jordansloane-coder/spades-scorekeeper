@@ -31,12 +31,20 @@ export function dealerForRound(players: Player[], roundNumber: number): Player {
   return players[(roundNumber - 1) % players.length];
 }
 
-// The one scoring rule: miss low -> 0, hit exactly -> flat 10, go over ->
-// however many tricks you actually took.
+// The scoring rule: miss low -> 0, hit exactly -> 10 plus your bid, go over
+// -> however many tricks you actually took.
 export function scoreForBid(bid: number, tricksWon: number): number {
   if (tricksWon < bid) return 0;
-  if (tricksWon === bid) return 10;
+  if (tricksWon === bid) return 10 + bid;
   return tricksWon;
+}
+
+// How the table's total bids compare to the cards actually in play this
+// hand — positive means overbid (more tricks claimed than exist), negative
+// means underbid (tricks nobody's claiming), 0 means it matches exactly.
+export function bidBalance(bids: Record<string, number>, cardsInHand: number): number {
+  const total = Object.values(bids).reduce((sum, b) => sum + b, 0);
+  return total - cardsInHand;
 }
 
 // Standard competition ranking (1, 1, 3 — ties share a rank, next rank

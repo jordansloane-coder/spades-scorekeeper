@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { Player } from '@/lib/types';
+import { bidBalance } from '@/lib/spadesRules';
 
 interface Props {
   players: Player[];
@@ -25,6 +26,8 @@ export default function BiddingScreen({ players, dealer, roundNumber, totalRound
       return { ...prev, [id]: next };
     });
   }
+
+  const balance = bidBalance(bids, cardsInHand);
 
   return (
     <div className="flex-1 flex flex-col items-center px-5 py-8 gap-5 max-w-md mx-auto w-full">
@@ -67,6 +70,22 @@ export default function BiddingScreen({ players, dealer, roundNumber, totalRound
           </div>
         ))}
       </div>
+
+      <p
+        className={`w-full text-center text-sm font-semibold rounded-xl py-3 px-4 ${
+          balance > 0
+            ? 'text-danger bg-danger/10'
+            : balance < 0
+              ? 'text-felt dark:text-gold bg-felt/10'
+              : 'opacity-50'
+        }`}
+      >
+        {balance > 0
+          ? `Overbid by ${balance} — somebody's not making it this hand.`
+          : balance < 0
+            ? `Underbid by ${Math.abs(balance)} — tricks are up for grabs.`
+            : 'Bids match the cards exactly.'}
+      </p>
 
       <button
         onClick={() => onSubmit(bids)}
